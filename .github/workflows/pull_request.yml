@@ -1,0 +1,51 @@
+name: Pull Request Target Repo
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  createPullRequest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target repository
+        uses: actions/checkout@v2
+        with:
+          repository: manuel-lang/Go-GitHub-Actions
+
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Replace version
+        uses: jacobtomlinson/gha-find-replace@master
+        with:
+          find: atlasdataabstractionlayer.git( --branch [^\s]+){0,1} 
+          replace: "Go-GitHub-Actions-Dependency.git --branch ${{ env.RELEASE_VERSION }}"
+          include: "Dockerfile"
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: Bump dependency version to ${{ env.RELEASE_VERSION }}
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: dependency-updates/dependency
+          delete-branch: true
+          title: '[Automated] Bump dependency version to ${{ env.RELEASE_VERSION }}'
+          body: |
+            Automatically bumped dependency version
+          labels: |
+            version bump
+            automated pr
+          assignees: manuel-lang
+          team-reviewers: |
+            owners
+            maintainers
+          draft: false
+
+      - name: Check outputs
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
