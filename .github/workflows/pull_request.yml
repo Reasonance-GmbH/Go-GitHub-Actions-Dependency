@@ -19,7 +19,7 @@ jobs:
       - name: Replace version
         uses: jacobtomlinson/gha-find-replace@master
         with:
-          find: atlasdataabstractionlayer.git( --branch [^\s]+){0,1} 
+          find: Go-GitHub-Actions-Dependency.git( --branch [^\s]+){0,1} 
           replace: "Go-GitHub-Actions-Dependency.git --branch ${{ env.RELEASE_VERSION }}"
           include: "Dockerfile"
 
