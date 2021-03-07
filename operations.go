@@ -1,4 +1,4 @@
-package Go-GitHub-Actions-Dependency
+package operations
 
 var z int
 
